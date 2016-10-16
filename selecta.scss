@@ -3,43 +3,95 @@
 //   border: thin solid #CCC;
 // }
 
-
+.selectaDom {
+  position: relative;
+}
 
 .selecta-sel{
   border: thin solid #999;
-  padding: 5px;
-  min-height: 35px;
+  padding: 5px 25px 5px 5px;
+  min-height: 24px;
   display:flex;
   align-items: flex-start;
   flex-flow: row wrap;
   /* This aligns items to the end line on main-axis */
   justify-content: flex-start;
-  /*list-style: none;*/
-  
-  > span {
-    padding: 2px 5px 5px 5px;
-    margin: 1px 2px 1px 0;
-    display: inline-block;
+
+  // background: url('chosen-sprite.png') no-repeat 100% -20px;
+  // background-clip: padding-box;
+  list-style: none;
+  margin: 0;
+
+  > li {
+    display:inline-block;
     font-size: 1em;
+    min-height: 24px;
   }
 
-  > span > span.glyphicon-remove {
-    margin-left: 5px;
-    font-size: 0.7em;
-    cursor: pointer;
+  > li.selecta-search {
+    min-width: 200px;
+
+    input.selecta-search-input {
+      border:none;
+      min-height: 24px;
+      outline: 0px solid transparent;
+      font-size: 1em;
+    }
+
   }
+
+  > li:first-child {
+    
+    > span {
+      padding: 2px 18px 2px 5px;
+      // margin: 1px 2px 1px 0;
+      margin-right: 5px;
+      display: inline-block;
+    }
+
+    .label{
+      background-color: #F0F8FF;
+      // min-width: 60px;
+      position: relative;
+      border-radius: 3px;
+      border: thin solid #CCC;
+    }
+
+    .glyphicon-remove {
+      cursor: pointer;
+      // background: url('chosen-sprite@2x.png') -84px 1px no-repeat;
+      background: url('chosen-sprite.png') -42px 1px no-repeat;
+      background-clip: padding-box;
+      width: 10px;
+      height: 10px;
+      position: absolute;
+      right:4px;
+      top: 5px;
+    }
+
+    .glyphicon-remove:hover {
+      background: url('chosen-sprite.png') -42px -10px no-repeat;
+    }
+  }
+  
+  
 }
+
 
 
 .selecta-list {
   border: thin solid #999;
   padding: 0;
+  margin-top: 0;
   list-style: none;
   display: none;
   background-color: #FEFEFE;
   z-index:2;
   position: absolute;
-  min-width: 150px; 
+  min-width: 150px;
+  max-height: 200px;
+  overflow-y: scroll;
+  width: calc(100% - 2px);
   
   > li {
     padding: 0 10px 5px;
