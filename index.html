@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Selecta test</title>
+
+  <script type="text/javascript" src="jquery-2.2.4.min.js"></script>
+  <script type="text/javascript" src="jquery.selecta.js"></script>
+
+  <script>
+    $(document).ready(function() {
+      $('.test-selecta').selecta();
+    });
+  </script>
+</head>
+<body>
+  <select name="" id="" class="test-selecta">
+    <option value="sv1">st1</option>
+    <option value="sv2">st2</option>
+    <option value="sv3">st3</option>
+    <option value="sv4">st4</option>
+    <option value="sv5">st5</option>
+  </select>
+
+  <br>
+
+  <select name="" id="" class="test-selecta" multiple>
+    <option value="v1">t1</option>
+    <option value="v2">t2</option>
+    <option value="v3">t3</option>
+    <option value="v4">t4</option>
+    <option value="v5">t5</option>
+  </select>
+
+  <button onclick="getValues()">Get values</button>
+</body>
+</html>
