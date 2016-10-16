@@ -1,10 +1,12 @@
 (function($) {
 
   $.fn.selectaValues = function() {
-    return $.each(this, function(selIdx, sel) {
-      return $(sel).data('selects');
+    values = [];
+    $.each(this, function(selIdx, sel) {
+      values.push(JSON.parse($(sel).data('selects')));
       // console.log($(sel).data('selects'));
     });
+    return values;
     // var selectaDom = $(this).next('.selectaDom');
     // console.log(selectaDom);
   };
@@ -111,7 +113,6 @@
       // Add new option from list
 
       $(selectaDom).find('.selecta-list > li').off('click').on('click', function(e) {
-        console.log('li clicked');
         var v = $(e.currentTarget).attr('value');
         var t = e.currentTarget.textContent;
 
@@ -144,6 +145,7 @@
           el.append('<span class="label label-info"><span data-v="'+ i.v +'">'+ i.t +'</span><span class="glyphicon glyphicon-remove"></span></span>');
         });
         // Hide list
+        clearTimeout(_self.dropDownListTimeout);
         $(e.currentTarget).parent().hide();
 
         $(sel).data('selects', JSON.stringify(order[idx]));
@@ -161,7 +163,7 @@
         // Set timeout here so action click on dropdown list has chance to execute
         _self.dropDownListTimeout = setTimeout( function() {
           selectaDom.find('.selecta-list').hide();
-        }, 200);
+        }, 500);
       });
 
 
