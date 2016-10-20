@@ -2,13 +2,24 @@
 
   $.fn.selectaValues = function() {
     values = [];
-    $.each(this, function(selIdx, sel) {
-      values.push(JSON.parse($(sel).data('selects')));
-      // console.log($(sel).data('selects'));
-    });
+    if(this.length > 1) {
+      $.each(this, function(selIdx, sel) {
+        var selects = $(sel).data('selects');
+        if(selects === undefined) {
+          values.push([]);
+        } else {
+          values.push(JSON.parse(selects));
+        }
+      });
+    } else if(this.length === 1) {
+      var selects = $(this).data('selects');
+      if(selects === undefined) {
+        values.push([]);
+      } else {
+        values.push(JSON.parse(selects));
+      }
+    }
     return values;
-    // var selectaDom = $(this).next('.selectaDom');
-    // console.log(selectaDom);
   };
 
   $.fn.selecta = function() {

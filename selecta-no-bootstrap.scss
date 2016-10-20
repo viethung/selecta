@@ -36,12 +36,14 @@
       min-height: 24px;
       outline: 0px solid transparent;
       font-size: 1em;
+      background:none;
+      background-color:rgba(0,0,0,0);
     }
 
   }
 
   > li:first-child {
-    
+
     > span {
       padding: 2px 18px 2px 5px;
       // margin: 1px 2px 1px 0;
@@ -51,6 +53,7 @@
 
     .label{
       background-color: #F0F8FF;
+      // color: black;
       // min-width: 60px;
       position: relative;
       border-radius: 3px;

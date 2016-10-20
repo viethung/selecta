@@ -1,0 +1,93 @@
+// .selectaDom{
+//   min-height: 20px;
+//   border: thin solid #CCC;
+// }
+
+.selectaDom {
+  position: relative;
+}
+
+.selecta-sel{
+  border: thin solid #999;
+  padding: 5px 25px 5px 5px;
+  min-height: 24px;
+  display:flex;
+  align-items: flex-start;
+  flex-flow: row wrap;
+  /* This aligns items to the end line on main-axis */
+  justify-content: flex-start;
+
+  // background: url('chosen-sprite.png') no-repeat 100% -20px;
+  // background-clip: padding-box;
+  list-style: none;
+  margin: 0;
+
+  > li {
+    display:flex;
+    align-items: flex-start;
+    flex-flow: row wrap;
+    /* This aligns items to the end line on main-axis */
+    justify-content: flex-start;
+
+    font-size: 1em;
+    min-height: 24px;
+    margin-right: 3px;
+
+    span {
+      margin-right: 3px;
+      margin-bottom: 3px;
+    }
+
+    .glyphicon-remove {
+      cursor: pointer;
+    }
+    .glyphicon-remove:hover {
+      color: #FFE4E1;
+    }
+  }
+
+  > li.selecta-search {
+    min-width: 200px;
+
+    input.selecta-search-input {
+      border:none;
+      min-height: 24px;
+      outline: 0px solid transparent;
+      font-size: 1em;
+      background:none;
+      background-color:rgba(0,0,0,0);
+    }
+
+  }
+}
+
+
+
+.selecta-list {
+  border: thin solid #999;
+  padding: 0;
+  margin-top: 0;
+  list-style: none;
+  display: none;
+  background-color: #FEFEFE;
+  z-index:2;
+  position: absolute;
+  min-width: 150px;
+  max-height: 200px;
+  overflow-y: scroll;
+  width: calc(100% - 2px);
+  
+  > li {
+    padding: 0 10px 5px;
+  }
+
+  > li.selected{
+    background-color:#3097D1;
+    color:#FFF;
+  }
+
+  > li:hover {
+    /*background-color: #ADD8E6;*/
+    background-color: rgba(173, 216, 230, 0.8);
+  }
+}
