@@ -29,9 +29,9 @@
   }
 
   > li.selecta-search {
-    min-width: 200px;
-
+    flex-grow: 1;
     input.selecta-search-input {
+      width: 100%;
       border:none;
       min-height: 24px;
       outline: 0px solid transparent;
@@ -58,6 +58,7 @@
       position: relative;
       border-radius: 3px;
       border: thin solid #CCC;
+      margin-bottom:1px;
     }
 
     .glyphicon-remove {
@@ -97,7 +98,7 @@
   width: calc(100% - 2px);
   
   > li {
-    padding: 0 10px 5px;
+    padding: 5px 10px 2px;
   }
 
   > li.selected{

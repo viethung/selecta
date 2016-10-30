@@ -1,6 +1,30 @@
 (function($) {
+  $.fn.selectaSetValues = function() {
+    values = arguments;
+    $.each(this, function(selIdx, sel) {
+      $(sel).data('selects', JSON.stringify(values));
+      // Redraw list and display
+      var selectaDom = $(sel).next('.selectaDom');
+      var el  = selectaDom
+                  .find('.selecta-sel > li:first-child')
+                  .empty();
+      // Show options from selecta list
+      selectaDom
+        .find('.selecta-list > li')
+        .removeClass('selected')
+        .show()
+      $(values).each(function(_idx, v) {
+        var item = selectaDom
+                    .find('.selecta-list > li[value="'+ v+'"]')
+                    .addClass('selected')
 
-  $.fn.selectaValues = function() {
+        el.append('<span class="label label-info"><span data-v="'+ v +'">'+ item.html() +'</span><span class="glyphicon glyphicon-remove"></span></span>');
+
+      });
+    });
+  }
+
+  $.fn.selectaGetValues = function() {
     values = [];
     if(this.length > 1) {
       $.each(this, function(selIdx, sel) {
@@ -25,6 +49,9 @@
   $.fn.selecta = function() {
     this.doms = [];
     var _t = this;
+
+
+    // Should have a centralise function to redraw all list and selected display
     
     return $.each(this, function(selIdx, sel) {
       var order = [];
@@ -37,7 +64,7 @@
       _self.multiple = $(sel).prop('multiple');
       
       $(sel).after('<div class="selectaDom clearfix">' + 
-                      '<ul class="selecta-sel"><li></li><li class="selecta-search"><input class="selecta-search-input" placeholder="Enter text to filter list"></li></ul>' + 
+                      '<ul class="selecta-sel" data-idx="'+ selIdx +'"><li></li><li class="selecta-search"><input class="selecta-search-input" data-idx="'+ selIdx +'" placeholder="Enter text to filter list"></li></ul>' + 
                       '<ul class="selecta-list" data-idx="'+ selIdx +'"></ul>' + 
                       '<div class="selecta-hidden" style="display:none;"></div>' + 
                     '</div>');
@@ -55,22 +82,55 @@
       // events
       // =================
       selectaDom.find('.selecta-sel').on('keyup', 'li.selecta-search > input.selecta-search-input', function(e) {
-        if(selectaDom.find('.selecta-list').is(':visible')) {
-        } else {
-          selectaDom.find('.selecta-list').show();
-        }
-        // filter select list
-        t = $(this).val();
-        if(t.length === 0) {
-          selectaDom.find('.selecta-list > li').show();
-        }
-        selectaDom.find('.selecta-list > li').each( function () {
-          if($(this).text().toUpperCase().search(t.toUpperCase()) === -1) {
-            $(this).hide();
-          } else {
-            $(this).show();
+        var idx = +$(e.currentTarget).data('idx');
+        if(e.key === "Backspace") {
+          if($.isArray(order) && order.length > 0 && order[idx] !== null) {
+            order[idx].pop()
+            // Redraw list and display
+            var el = $(selectaDom).find('.selecta-sel > li:first-child');
+            el.empty();
+            // Show options from selecta list
+            selectaDom
+              .find('.selecta-list > li')
+              .removeClass('selected')
+              .show()
+
+            $(order[idx]).each(function(_idx, i) {
+              el.append('<span class="label label-info"><span data-v="'+ i.v +'">'+ i.t +'</span><span class="glyphicon glyphicon-remove"></span></span>');
+
+              selectaDom
+                .find('.selecta-list > li[value="'+ i.v+'"]')
+                .addClass('selected')
+            });
+            // Hide list
+            clearTimeout(_self.dropDownListTimeout);
+            // $(e.currentTarget).parent().hide();
+
+            $(sel).data('selects', JSON.stringify(order[idx]));
+
+            // clear search box and focus
+            selectaDom.find('.selecta-sel > li.selecta-search > input.selecta-search-input').focus().val('')
+          
           }
-        })
+        } else {
+          if(selectaDom.find('.selecta-list').is(':visible')) {
+          } else {
+            selectaDom.find('.selecta-list').show();
+          }
+          // filter select list
+          t = $(this).val();
+          if(t.length === 0) {
+            selectaDom.find('.selecta-list > li').show();
+          }
+          selectaDom.find('.selecta-list > li').each( function () {
+            if($(this).text().toUpperCase().search(t.toUpperCase()) === -1) {
+              $(this).hide();
+            } else {
+              $(this).show();
+            }
+          })
+          
+        }
       });
 
 

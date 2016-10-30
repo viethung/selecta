@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Selecta test</title>
-  <link href="min/selecta.css" rel="stylesheet">
+  <link href="min/selecta-no-bootstrap.css" rel="stylesheet">
 
   <script type="text/javascript" src="jquery-2.2.4.min.js"></script>
   <script type="text/javascript" src="min/jquery.selecta-min.js"></script>
@@ -14,13 +14,23 @@
     });
 
     function getValues() {
-      var values = $('.test-selecta:nth-of-type(2)').selectaValues();
+      var values = $('.test-selecta:nth-of-type(2)').selectaGetValues();
       // var values = $('.test-selecta').selectaValues();
       console.log(values);
+    }
+
+    function setValues() {
+      // You can enter a list of pre selected values
+      // $('.test-selecta:nth-of-type(2)').selectaSetValues('v5', 'v3', 'v1', 'v20');
+      // However, if you have an array of values
+      var values = ['v5', 'v3', 'v1', 'v20'];
+      // Then you can use apply
+      $.fn.selectaSetValues.apply( $('.test-selecta:nth-of-type(2)'), values )
     }
   </script>
 </head>
 <body>
+  Single list
   <select name="" id="" class="test-selecta">
     <option value="sv1">st1</option>
     <option value="sv2">st2</option>
@@ -31,6 +41,7 @@
 
   <br>
 
+  Multi select
   <select name="" id="" class="test-selecta" multiple>
     <option value="v1">Sydney</option>
     <option value="v2">Hobart</option>
@@ -64,5 +75,6 @@
   <span class="glyphicon-remove"></span>
 
   <button onclick="getValues()">Get values</button>
+  <button onclick="setValues()">Set values</button>
 </body>
 </html>
