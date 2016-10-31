@@ -32,10 +32,12 @@
     font-size: 1em;
     min-height: 24px;
     margin-right: 3px;
+  }
 
+  > li:first-child {
     span {
-      margin-right: 3px;
-      margin-bottom: 3px;
+      margin: 0 3px 3px 0;
+      display: inline-block;
     }
 
     .glyphicon-remove {
@@ -47,9 +49,10 @@
   }
 
   > li.selecta-search {
-    min-width: 200px;
+    flex-grow: 1;
 
     input.selecta-search-input {
+      width: 100%;
       border:none;
       min-height: 24px;
       outline: 0px solid transparent;
@@ -80,7 +83,7 @@
   left: 14px;
   
   > li {
-    padding: 0 10px 5px;
+    padding: 5px 10px 2px;
   }
 
   > li.selected{

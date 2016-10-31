@@ -191,7 +191,7 @@
         });
 
         // Redraw display boxes
-        this.redrawDisplayBoxes();
+        _self.redrawDisplayBoxes();
 
         // Un-tick selected item from drop down list
         var selecta_li = $(_self.el)
