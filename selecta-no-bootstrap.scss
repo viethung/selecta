@@ -38,7 +38,10 @@
       font-size: 1em;
       background:none;
       background-color:rgba(0,0,0,0);
+
     }
+    // input.selecta-search-input:focus + .selecta-list{display:block;}
+    // input.selecta-search-input:not(:focus) + .selecta-list:visible{display:block;}
 
   }
 
@@ -77,8 +80,6 @@
       background: url('chosen-sprite.png') -42px -10px no-repeat;
     }
   }
-  
-  
 }
 
 
@@ -95,7 +96,9 @@
   min-width: 150px;
   max-height: 200px;
   overflow-y: scroll;
-  width: calc(100% - 2px);
+  width: calc(100% - 24px);
+
+  left: 14px;
   
   > li {
     padding: 5px 10px 2px;

@@ -1,244 +1,219 @@
 (function($) {
-  $.fn.selectaSetValues = function() {
-    values = arguments;
-    $.each(this, function(selIdx, sel) {
-      $(sel).data('selects', JSON.stringify(values));
-      // Redraw list and display
-      var selectaDom = $(sel).next('.selectaDom');
-      var el  = selectaDom
-                  .find('.selecta-sel > li:first-child')
-                  .empty();
-      // Show options from selecta list
-      selectaDom
-        .find('.selecta-list > li')
-        .removeClass('selected')
-        .show()
-      $(values).each(function(_idx, v) {
-        var item = selectaDom
-                    .find('.selecta-list > li[value="'+ v+'"]')
-                    .addClass('selected')
-
-        el.append('<span class="label label-info"><span data-v="'+ v +'">'+ item.html() +'</span><span class="glyphicon glyphicon-remove"></span></span>');
-
-      });
-    });
+  // function db() {
+  //   for(var a in arguments) {
+  //     window.console.log(arguments[a]);
+  //   }
+  // }
+  function SelectaClass(element) {
+    this.el             = element; // element this plugin bind to
+    this.orderedValues  = [];      // selected values
+    this.originalValues = [];      // array of value and text object from select
   }
 
-  $.fn.selectaGetValues = function() {
-    values = [];
-    if(this.length > 1) {
-      $.each(this, function(selIdx, sel) {
-        var selects = $(sel).data('selects');
-        if(selects === undefined) {
-          values.push([]);
-        } else {
-          values.push(JSON.parse(selects));
-        }
-      });
-    } else if(this.length === 1) {
-      var selects = $(this).data('selects');
-      if(selects === undefined) {
-        values.push([]);
-      } else {
-        values.push(JSON.parse(selects));
-      }
-    }
-    return values;
+  SelectaClass.prototype.get = function() {
+    return this.orderedValues;
   };
 
-  $.fn.selecta = function() {
-    this.doms = [];
-    var _t = this;
+  SelectaClass.prototype.set = function() {
+    var values = [].join.call(arguments, ':'); // turn arguments into array
+    this.orderedValues = this.originalValues.filter(function(i) {
+      return (values.indexOf(i.value) >= 0);
+    });
+    this.redrawDisplayBoxes();
+
+    // redraw selected in list
+    this.redrawSelectedList();
+  };
+
+  SelectaClass.prototype.redrawDisplayBoxes = function() {
+    var displayBoxesHtml = '';
+    $(this.orderedValues).each(function(_idx, ov) {
+      displayBoxesHtml += '<span class="label label-info"><span data-v="'+ ov.value +'">'+ ov.text +'</span><span class="glyphicon glyphicon-remove"></span></span>';
+    });
+    // Redraw display boxes - show html
+    $(this.el)
+      .next('.selecta-sel')
+      .find('> li:first-child')
+      .empty()
+      .append(displayBoxesHtml);
+  };
+
+  SelectaClass.prototype.redrawSelectedList = function() {
+    var listbox = $(this.el).next('.selecta-sel').find('.selecta-list');
+
+    // clear all selected and show them all
+    listbox
+      .find('li')
+      .removeClass('selected')
+      .show();
+
+    var liItems = [];
+    $(this.orderedValues).each(function(_idx, ov) {
+      liItems.push('li[data-v="'+ ov.value +'"]');
+    });
+    listbox
+      .find(liItems.join(','))
+      .addClass('selected');
+  };
+
+  SelectaClass.prototype.init = function() {
+    var _self = this;
+    var list = '';
+    $.each(this.el, function(selIdx, sel) {
+      list += '<li data-v="'+$(sel).val()+'">'+$(sel).html()+'</li>';
+      _self.originalValues.push({value: $(sel).val(), text: $(sel).html()});
+    });
 
 
-    // Should have a centralise function to redraw all list and selected display
-    
-    return $.each(this, function(selIdx, sel) {
-      var order = [];
-      _t.doms[selIdx] = {};
-      var _self = _t.doms[selIdx];
+    // Prepare dom and display
+    $(this.el)
+      .hide()
+      .after(
+        '<ul class="selecta-sel">' + 
+          '<li></li>' +
+          '<li class="selecta-search">' +
+            '<input class="selecta-search-input" placeholder="Enter text to filter list">' + 
+            '<ul class="selecta-list">'+list+'</ul>' +
+          '</li>' + 
+        '</ul>'
+        
+      );
 
-      // Hide original select element
-      $(sel).hide();
 
-      _self.multiple = $(sel).prop('multiple');
-      
-      $(sel).after('<div class="selectaDom clearfix">' + 
-                      '<ul class="selecta-sel" data-idx="'+ selIdx +'"><li></li><li class="selecta-search"><input class="selecta-search-input" data-idx="'+ selIdx +'" placeholder="Enter text to filter list"></li></ul>' + 
-                      '<ul class="selecta-list" data-idx="'+ selIdx +'"></ul>' + 
-                      '<div class="selecta-hidden" style="display:none;"></div>' + 
-                    '</div>');
-      var  selectaDom = $(sel).next('.selectaDom');
+    // Event: click on drop down list, add/remove selected
+    $(this.el)
+      .siblings('.selecta-sel')
+      .find('ul.selecta-list > li')
+      .off('click')
+      .on('click', function() {
+        $(this)
+          .toggleClass('selected')
+          .parent().hide();
 
-      var options = [];
+        var v = $(this).data('v');
+        var t = $(this).html();
 
-      $.each($(sel).find('option'), function(optIdx, opt) {
-        var v = $(opt).prop('value'),
-            t = $(opt).text();
-        options[optIdx] = { v: v, t: t };
-        selectaDom.find('.selecta-list').append('<li value="'+ v +'">'+ t +'</li>');
+        if($(this).hasClass('selected')) { //add
+          _self.orderedValues.push({ value: v, text: t });
+        } else { //remove
+          _self.orderedValues = _self.orderedValues.filter( function ( obj ) {
+            return (obj.value !== v && obj.text !== t);
+          });
+        }
+
+        _self.redrawDisplayBoxes();
+
+        // Clear search box
+        $(this)
+          .closest('.selecta-sel')
+          .find('input.selecta-search-input')
+          .val('');
+
+        //Reset drop down list - Show all options
+        $(_self.el)
+          .siblings('.selecta-sel')
+          .find('.selecta-list > li').show();
       });
 
-      // events
-      // =================
-      selectaDom.find('.selecta-sel').on('keyup', 'li.selecta-search > input.selecta-search-input', function(e) {
-        var idx = +$(e.currentTarget).data('idx');
-        if(e.key === "Backspace") {
-          if($.isArray(order) && order.length > 0 && order[idx] !== null) {
-            order[idx].pop()
-            // Redraw list and display
-            var el = $(selectaDom).find('.selecta-sel > li:first-child');
-            el.empty();
-            // Show options from selecta list
-            selectaDom
-              .find('.selecta-list > li')
-              .removeClass('selected')
-              .show()
 
-            $(order[idx]).each(function(_idx, i) {
-              el.append('<span class="label label-info"><span data-v="'+ i.v +'">'+ i.t +'</span><span class="glyphicon glyphicon-remove"></span></span>');
 
-              selectaDom
-                .find('.selecta-list > li[value="'+ i.v+'"]')
-                .addClass('selected')
-            });
-            // Hide list
-            clearTimeout(_self.dropDownListTimeout);
-            // $(e.currentTarget).parent().hide();
-
-            $(sel).data('selects', JSON.stringify(order[idx]));
-
-            // clear search box and focus
-            selectaDom.find('.selecta-sel > li.selecta-search > input.selecta-search-input').focus().val('')
-          
-          }
+    // Event: focus on search box, display drop down list
+    $(this.el)
+      .siblings('.selecta-sel')
+      .find('input.selecta-search-input')
+      .off('focus')
+      .on('focus', function() {
+        $('.selecta-list').hide();
+        var listbox = $(this).siblings('.selecta-list');
+        if(listbox.is(':visible')) {
+          listbox.hide();
         } else {
-          if(selectaDom.find('.selecta-list').is(':visible')) {
-          } else {
-            selectaDom.find('.selecta-list').show();
-          }
-          // filter select list
-          t = $(this).val();
-          if(t.length === 0) {
-            selectaDom.find('.selecta-list > li').show();
-          }
-          selectaDom.find('.selecta-list > li').each( function () {
-            if($(this).text().toUpperCase().search(t.toUpperCase()) === -1) {
-              $(this).hide();
-            } else {
-              $(this).show();
+          listbox.show();
+        }
+      })
+      // close drop down list if lost focus
+      .on('focusout', function() {
+        var listbox = $(this).siblings('.selecta-list');
+        // Set timeout here so action click on dropdown list has chance to execute
+        _self.dropDownListTimeout = setTimeout( function() {
+          listbox.hide();
+        }, 500);
+      })
+      .off('keyup')
+      .on('keyup', function(e) {
+        var t = $(this).val();
+        if(t.length === 0 && e.key === "Backspace") {
+          var delItem = _self.orderedValues.pop();
+
+          // Redraw display boxes
+          _self.redrawDisplayBoxes();
+
+          // Un-tick selected item from drop down list
+          var selecta_li = $(_self.el)
+                            .siblings('.selecta-sel')
+                            .find('.selecta-list > li.selected[data-v="'+delItem.value+'"]');
+          $.each(selecta_li, function ( idxLi, li ) {
+            if($(li).html() === delItem.text) {
+              $(li).removeClass('selected');
             }
-          })
-          
+          });
+
+        } else { // filter drop down list
+          // filter select list
+          $(_self.el)
+              .siblings('.selecta-sel')
+              .find('.selecta-list > li')
+              .each( function () {
+                if($(this).text().toUpperCase().search(t.toUpperCase()) === -1) {
+                  $(this).hide();
+                } else {
+                  $(this).show();
+                }
+              });
         }
+
       });
 
 
-      // =================
-      // Trigger open drop down list
-      // selectaDom.find('.selecta-sel').off('click').on('click', function(e) {
-      selectaDom.find('.selecta-sel').on('click', function(e) {
-        if($(e.currentTarget).siblings('.selecta-list').is(':visible')) {
-          $(e.currentTarget).siblings('.selecta-list').hide();
-        } else {
-          $(e.currentTarget).siblings('.selecta-list').show();
-        }
-      });
-
-
-      // ==================
-      // Remove
-      selectaDom.find('.selecta-sel').on('click', 'span.label > span.glyphicon-remove', function(e) {
-      // selectaDom.find('.selecta-sel span.glyphicon-remove').off('click').on('click', 'span.label > span.glyphicon-remove', function(e) {
-        e.preventDefault();
+    // Event: remove box by click on x
+    $(this.el)
+      .siblings('.selecta-sel')
+      .on('click', 'span.label > span.glyphicon-remove', function(e) {
+        e.stopPropagation();
 
         var el = $(this).siblings('span');
         var v = el.data('v');
         var t = el.text();
 
-        var list = order[selIdx];
-        order[selIdx] = list.filter( function ( obj ) {
-          return (obj.v !== v && obj.t !== t);
+        // remove value
+        _self.orderedValues = _self.orderedValues.filter( function ( obj ) {
+          return (obj.value !== v && obj.text !== t);
         });
 
-        var selecta_li = selectaDom.find('.selecta-list > li.selected[value="'+v+'"]');
+        // Redraw display boxes
+        this.redrawDisplayBoxes();
+
+        // Un-tick selected item from drop down list
+        var selecta_li = $(_self.el)
+                          .siblings('.selecta-sel')
+                          .find('.selecta-list > li.selected[data-v="'+v+'"]');
         $.each(selecta_li, function ( idxLi, li ) {
           if($(li).html() === t) {
             $(li).removeClass('selected');
           }
         });
 
-
-        var thisSel = $(selectaDom).find('.selecta-sel > li:first-child');
-        thisSel.empty();
-        $(order[selIdx]).each(function(_idx, i) {
-          thisSel.append('<span class="label label-info"><span data-v="'+ i.v +'">'+ i.t +'</span><span class="glyphicon glyphicon-remove"></span></span>');
-        });
-        $(sel).data('selects', JSON.stringify(order[selIdx]));
-        return false;
       });
-
-
-
-      // ===================
-      // Add new option from list
-
-      $(selectaDom).find('.selecta-list > li').off('click').on('click', function(e) {
-        var v = $(e.currentTarget).attr('value');
-        var t = e.currentTarget.textContent;
-
-        var idx = +$(e.currentTarget).parent().data('idx');
-        if(order[idx] === undefined) {
-          order[idx] = [];
-        }
-
-        var list = order[idx];
-        var itm = list.find( function( obj ) { 
-          return (obj.v === v && obj.t === t);
-        });
-        if(itm === undefined) {
-          if(_self.multiple) {
-            list.push({v: v, t: t});
-          } else {
-            order[idx] = [{v: v, t: t}];
-            $(e.currentTarget).siblings('li').removeClass('selected');
-          }
-          $(e.currentTarget).addClass('selected'); 
-        } else {
-          order[idx] = list.filter( function(itmObj) {
-            return (itmObj.v !== v && itmObj.t !== t);
-          });
-          $(e.currentTarget).removeClass('selected');
-        }
-        var el = $(selectaDom).find('.selecta-sel > li:first-child');
-        el.empty();
-        $(order[idx]).each(function(_idx, i) {
-          el.append('<span class="label label-info"><span data-v="'+ i.v +'">'+ i.t +'</span><span class="glyphicon glyphicon-remove"></span></span>');
-        });
-        // Hide list
-        clearTimeout(_self.dropDownListTimeout);
-        $(e.currentTarget).parent().hide();
-
-        $(sel).data('selects', JSON.stringify(order[idx]));
-        // Show options from selecta list
-        selectaDom.find('.selecta-list > li').show();
-        // clear search box and focus
-        selectaDom.find('.selecta-sel > li.selecta-search > input.selecta-search-input').focus().val('')
-      });
-
-
-
-
-      // =======
-      selectaDom.find('.selecta-sel').on('focusout', 'li.selecta-search > input.selecta-search-input', function(e) {
-        // Set timeout here so action click on dropdown list has chance to execute
-        _self.dropDownListTimeout = setTimeout( function() {
-          selectaDom.find('.selecta-list').hide();
-        }, 500);
-      });
-
-
-    });
   };
 
+  $.fn.selecta = function() {
+    return this.each(function() {
+      var instance = $(this).data('selecta');
+      if (!instance) {
+        instance = new SelectaClass(this);
+        $(this).data('selecta', instance);
+      }
+      instance.init.apply(instance, arguments);
+    });
+  };
 }(jQuery));

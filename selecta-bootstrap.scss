@@ -75,7 +75,9 @@
   min-width: 150px;
   max-height: 200px;
   overflow-y: scroll;
-  width: calc(100% - 2px);
+  width: calc(100% - 24px);
+
+  left: 14px;
   
   > li {
     padding: 0 10px 5px;

@@ -14,18 +14,18 @@
     });
 
     function getValues() {
-      var values = $('.test-selecta:nth-of-type(2)').selectaGetValues();
-      // var values = $('.test-selecta').selectaValues();
-      console.log(values);
+      var values = $('.test-selecta:nth-of-type(2)').data('selecta').get();
+      alert(JSON.stringify(values));
     }
 
     function setValues() {
+      var instance = $('.test-selecta:nth-of-type(2)').data('selecta');
       // You can enter a list of pre selected values
-      // $('.test-selecta:nth-of-type(2)').selectaSetValues('v5', 'v3', 'v1', 'v20');
+      // instance.set('v5', 'v3', 'v1', 'v20');
       // However, if you have an array of values
       var values = ['v5', 'v3', 'v1', 'v20'];
       // Then you can use apply
-      $.fn.selectaSetValues.apply( $('.test-selecta:nth-of-type(2)'), values )
+      instance.set.apply(instance, values);
     }
   </script>
 </head>
