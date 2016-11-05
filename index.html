@@ -13,12 +13,23 @@
       $('.test-selecta').selecta();
     });
 
-    function getValues() {
+    function getValues1() {
+      var values = $('.test-selecta:nth-of-type(1)').data('selecta').get();
+      alert(JSON.stringify(values));
+    }
+
+    function setValues1() {
+      var instance = $('.test-selecta:nth-of-type(1)').data('selecta');
+      var values = ['sv5', 'sv3', 'sv1', 'sv2'];
+      instance.set.apply(instance, values);
+    }
+
+    function getValues2() {
       var values = $('.test-selecta:nth-of-type(2)').data('selecta').get();
       alert(JSON.stringify(values));
     }
 
-    function setValues() {
+    function setValues2() {
       var instance = $('.test-selecta:nth-of-type(2)').data('selecta');
       // You can enter a list of pre selected values
       // instance.set('v5', 'v3', 'v1', 'v20');
@@ -31,7 +42,7 @@
 </head>
 <body>
   Single list
-  <select name="" id="" class="test-selecta">
+  <select name="" id="" class="test-selecta abc">
     <option value="sv1">st1</option>
     <option value="sv2">st2</option>
     <option value="sv3">st3</option>
@@ -40,6 +51,11 @@
   </select>
 
   <br>
+
+  <button onclick="getValues1()">Get values</button>
+  <button onclick="setValues1()">Set values</button>
+
+  <br><br>
 
   Multi select
   <select name="" id="" class="test-selecta" multiple>
@@ -74,7 +90,7 @@
 
   <span class="glyphicon-remove"></span>
 
-  <button onclick="getValues()">Get values</button>
-  <button onclick="setValues()">Set values</button>
+  <button onclick="getValues2()">Get values</button>
+  <button onclick="setValues2()">Set values</button>
 </body>
 </html>
