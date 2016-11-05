@@ -31,13 +31,13 @@
   SelectaClass.prototype.redrawDisplayBoxes = function() {
     var displayBoxesHtml = '';
     $(this.orderedValues).each(function(_idx, ov) {
-      displayBoxesHtml += '<li class="label label-info selecta-sel-li"><span data-v="'+ ov.value +'">'+ ov.text +'</span><span class="glyphicon glyphicon-remove"></span></li>';
+      displayBoxesHtml += '<li class="selecta-sel-li"><span class="label label-info"><span data-v="'+ ov.value +'">'+ ov.text +'</span><span class="glyphicon glyphicon-remove"></span></span></li>';
     });
     // Redraw display boxes - show html
     $(this.el)
       .next('.selecta-sel')
       .find('> li.selecta-sel-li')
-      .remove()
+      .remove();
 
     $(this.el)
       .next('.selecta-sel')
