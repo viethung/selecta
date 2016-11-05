@@ -8,6 +8,9 @@
     this.el             = element; // element this plugin bind to
     this.orderedValues  = [];      // selected values
     this.originalValues = [];      // array of value and text object from select
+    this.multiple       = $(element).attr('multiple') ? true : false;
+
+    return this;
   }
 
   SelectaClass.prototype.get = function() {
@@ -28,14 +31,17 @@
   SelectaClass.prototype.redrawDisplayBoxes = function() {
     var displayBoxesHtml = '';
     $(this.orderedValues).each(function(_idx, ov) {
-      displayBoxesHtml += '<span class="label label-info"><span data-v="'+ ov.value +'">'+ ov.text +'</span><span class="glyphicon glyphicon-remove"></span></span>';
+      displayBoxesHtml += '<li class="label label-info selecta-sel-li"><span data-v="'+ ov.value +'">'+ ov.text +'</span><span class="glyphicon glyphicon-remove"></span></li>';
     });
     // Redraw display boxes - show html
     $(this.el)
       .next('.selecta-sel')
-      .find('> li:first-child')
-      .empty()
-      .append(displayBoxesHtml);
+      .find('> li.selecta-sel-li')
+      .remove()
+
+    $(this.el)
+      .next('.selecta-sel')
+      .prepend(displayBoxesHtml);
   };
 
   SelectaClass.prototype.redrawSelectedList = function() {
@@ -59,25 +65,38 @@
   SelectaClass.prototype.init = function() {
     var _self = this;
     var list = '';
+
     $.each(this.el, function(selIdx, sel) {
       list += '<li data-v="'+$(sel).val()+'">'+$(sel).html()+'</li>';
-      _self.originalValues.push({value: $(sel).val(), text: $(sel).html()});
+      if(_self.multiple) {
+        _self.originalValues.push({value: $(sel).val(), text: $(sel).html()});
+      } else {
+        _self.originalValues = [{value: $(sel).val(), text: $(sel).html()}];
+      }
     });
 
 
     // Prepare dom and display
+    var origClass = $(this.el).attr('class');
     $(this.el)
       .hide()
       .after(
-        '<ul class="selecta-sel">' + 
-          '<li></li>' +
+        '<ul class="selecta-sel ' + origClass + '">' + 
           '<li class="selecta-search">' +
             '<input class="selecta-search-input" placeholder="Enter text to filter list">' + 
             '<ul class="selecta-list">'+list+'</ul>' +
           '</li>' + 
         '</ul>'
-        
       );
+      // .after(
+      //   '<ul class="selecta-sel ' + origClass + '">' + 
+      //     '<li></li>' +
+      //     '<li class="selecta-search">' +
+      //       '<input class="selecta-search-input" placeholder="Enter text to filter list">' + 
+      //       '<ul class="selecta-list">'+list+'</ul>' +
+      //     '</li>' + 
+      //   '</ul>'
+      // );
 
 
     // Event: click on drop down list, add/remove selected
@@ -86,6 +105,7 @@
       .find('ul.selecta-list > li')
       .off('click')
       .on('click', function() {
+        // this: li from drop down list
         $(this)
           .toggleClass('selected')
           .parent().hide();
@@ -93,15 +113,26 @@
         var v = $(this).data('v');
         var t = $(this).html();
 
+        var instance = $(this).closest('.selecta-sel').prev('select').data('selecta');
+
         if($(this).hasClass('selected')) { //add
-          _self.orderedValues.push({ value: v, text: t });
+          if(instance.multiple) {
+            instance.orderedValues.push({ value: v, text: t });
+          } else {
+            instance.orderedValues = [{ value: v, text: t }];
+          }
         } else { //remove
-          _self.orderedValues = _self.orderedValues.filter( function ( obj ) {
-            return (obj.value !== v && obj.text !== t);
-          });
+          if(instance.multiple) {
+            instance.orderedValues = instance.orderedValues.filter( function ( obj ) {
+              return (obj.value !== v);
+            });
+          } else {
+            instance.orderedValues = [];
+          }
         }
 
-        _self.redrawDisplayBoxes();
+        instance.redrawDisplayBoxes();
+        instance.redrawSelectedList();
 
         // Clear search box
         $(this)
@@ -110,7 +141,7 @@
           .val('');
 
         //Reset drop down list - Show all options
-        $(_self.el)
+        $(instance.el)
           .siblings('.selecta-sel')
           .find('.selecta-list > li').show();
       });
@@ -187,7 +218,7 @@
 
         // remove value
         _self.orderedValues = _self.orderedValues.filter( function ( obj ) {
-          return (obj.value !== v && obj.text !== t);
+          return (obj.value !== v);
         });
 
         // Redraw display boxes
@@ -204,6 +235,7 @@
         });
 
       });
+
   };
 
   $.fn.selecta = function() {
